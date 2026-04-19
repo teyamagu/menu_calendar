@@ -1,0 +1,5 @@
+--swiftversion 5.9
+--indent 4
+--maxwidth 130
+--exclude .build,dist,.swiftpm,Packages
+--disable redundantSelf, sortedImports, noForceUnwrapInTests, wrapPropertyBodies

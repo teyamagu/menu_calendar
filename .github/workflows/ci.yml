@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-test:
+    name: Lint, format check, test
+    # ViewInspector 0.10.x needs Swift 6 / Xcode 16; default Xcode on macos-14 cannot build it.
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install SwiftLint and SwiftFormat
+        run: |
+          brew list swiftlint &>/dev/null || brew install swiftlint
+          brew list swiftformat &>/dev/null || brew install swiftformat
+
+      - name: SwiftFormat (check only)
+        run: swiftformat . --lint --config .swiftformat
+
+      - name: SwiftLint
+        run: swiftlint lint --strict --config .swiftlint.yml
+
+      - name: Run tests
+        run: swift test
