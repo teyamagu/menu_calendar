@@ -12,7 +12,7 @@ final class MenuBarDateFormatterTests: XCTestCase {
         let ref = DateFormatter()
         ref.locale = ja
         ref.timeZone = tz
-        ref.dateFormat = "EEE yyyy/MM/dd HH:mm"
+        ref.dateFormat = MenuBarDateFormatter.titleFormatPattern
         let expected = ref.string(from: date)
         let text = MenuBarDateFormatter.makeTitle(from: date, locale: ja, timeZone: tz)
         XCTAssertEqual(text, expected)
@@ -38,7 +38,7 @@ final class MenuBarDateFormatterTests: XCTestCase {
         let ref = DateFormatter()
         ref.locale = en
         ref.timeZone = tokyo
-        ref.dateFormat = "EEE yyyy/MM/dd HH:mm"
+        ref.dateFormat = MenuBarDateFormatter.titleFormatPattern
         let expected = ref.string(from: date)
         let text = MenuBarDateFormatter.makeTitle(from: date, locale: en, timeZone: tokyo)
         XCTAssertEqual(text, expected)
@@ -116,7 +116,7 @@ final class MonthCalendarModelTests: XCTestCase {
         let calendar = TestCalendars.gregorianUTC(firstWeekday: 2)
         let anchor = TestCalendars.date(year: 2026, month: 3, day: 26, calendar: calendar)
         let grid = MonthCalendarModel.daysGrid(for: anchor, calendar: calendar)
-        XCTAssertEqual(grid.count, 42)
+        XCTAssertEqual(grid.count, MonthCalendarModel.daysGridCellCount)
         for idx in grid.indices.dropFirst() {
             let prev = grid[idx - 1]
             let cur = grid[idx]
@@ -153,7 +153,11 @@ final class MonthCalendarModelTests: XCTestCase {
         XCTAssertTrue(MonthCalendarModel.isSameDay(first, expectedStart, calendar: calendar))
 
         guard let last = grid.last,
-              let expectedLast = calendar.date(byAdding: .day, value: 41, to: expectedStart)
+              let expectedLast = calendar.date(
+                  byAdding: .day,
+                  value: MonthCalendarModel.daysGridCellCount - 1,
+                  to: expectedStart
+              )
         else {
             return XCTFail("last cell")
         }
@@ -176,7 +180,7 @@ final class MonthCalendarModelTests: XCTestCase {
         let calendar = TestCalendars.gregorianUTC(firstWeekday: 2)
         let anchor = TestCalendars.date(year: 2025, month: 2, day: 15, calendar: calendar)
         let grid = MonthCalendarModel.daysGrid(for: anchor, calendar: calendar)
-        XCTAssertEqual(grid.count, 42)
+        XCTAssertEqual(grid.count, MonthCalendarModel.daysGridCellCount)
         let inMonth = grid.filter { MonthCalendarModel.isSameMonth($0, anchor, calendar: calendar) }
         XCTAssertEqual(inMonth.count, 28)
     }

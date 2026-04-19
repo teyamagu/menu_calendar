@@ -5,6 +5,20 @@ public struct MonthCalendarView: View {
     @Binding private var selectedDate: Date
     private let calendar: Calendar
 
+    private enum Metrics {
+        static let navHStackSpacing: CGFloat = 8
+        static let navChevronFontSize: CGFloat = 12
+        static let navChevronWeight: Font.Weight = .semibold
+        static let navButtonFrame: CGFloat = 20
+        static let headerBottomPadding: CGFloat = 4
+        static let weekdayRowBottomPadding: CGFloat = 4
+        static let gridSpacing: CGFloat = 1
+        static let dayCellFontSize: CGFloat = 14
+        static let dayCellFontWeight: Font.Weight = .medium
+        static let dayCellMinHeight: CGFloat = 22
+        static let selectionCornerRadius: CGFloat = 6
+    }
+
     public init(selectedDate: Binding<Date>, calendar: Calendar = .current) {
         self._selectedDate = selectedDate
         self.calendar = calendar
@@ -24,17 +38,8 @@ public struct MonthCalendarView: View {
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            HStack(spacing: 8) {
-                Button {
-                    if let moved = CalendarMonthNavigator.monthOffset(from: selectedDate, by: -1, calendar: calendar) {
-                        selectedDate = moved
-                    }
-                } label: {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 12, weight: .semibold))
-                        .frame(width: 20, height: 20)
-                }
-                .buttonStyle(.plain)
+            HStack(spacing: Metrics.navHStackSpacing) {
+                monthNavigationButton(systemName: "chevron.left", monthDelta: -1)
 
                 Spacer(minLength: 0)
 
@@ -44,18 +49,9 @@ public struct MonthCalendarView: View {
 
                 Spacer(minLength: 0)
 
-                Button {
-                    if let moved = CalendarMonthNavigator.monthOffset(from: selectedDate, by: 1, calendar: calendar) {
-                        selectedDate = moved
-                    }
-                } label: {
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 12, weight: .semibold))
-                        .frame(width: 20, height: 20)
-                }
-                .buttonStyle(.plain)
+                monthNavigationButton(systemName: "chevron.right", monthDelta: 1)
             }
-            .padding(.bottom, 4)
+            .padding(.bottom, Metrics.headerBottomPadding)
 
             HStack(spacing: 0) {
                 ForEach(weekdaySymbolsInOrder.indices, id: \.self) { idx in
@@ -65,11 +61,11 @@ public struct MonthCalendarView: View {
                         .frame(maxWidth: .infinity)
                 }
             }
-            .padding(.bottom, 4)
+            .padding(.bottom, Metrics.weekdayRowBottomPadding)
 
             LazyVGrid(
                 columns: Array(repeating: GridItem(.flexible(), spacing: 0), count: 7),
-                spacing: 1
+                spacing: Metrics.gridSpacing
             ) {
                 ForEach(daysGrid, id: \.timeIntervalSince1970) { date in
                     let day = calendar.component(.day, from: date)
@@ -81,20 +77,37 @@ public struct MonthCalendarView: View {
                     } label: {
                         ZStack {
                             if isSelected {
-                                RoundedRectangle(cornerRadius: 6)
+                                RoundedRectangle(cornerRadius: Metrics.selectionCornerRadius)
                                     .fill(Color.accentColor)
                                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                             }
 
                             Text("\(day)")
-                                .font(.system(size: 14, weight: .medium))
+                                .font(.system(size: Metrics.dayCellFontSize, weight: Metrics.dayCellFontWeight))
                                 .foregroundStyle(isSelected ? .white : (inMonth ? .primary : .secondary))
-                                .frame(maxWidth: .infinity, minHeight: 22)
+                                .frame(maxWidth: .infinity, minHeight: Metrics.dayCellMinHeight)
                         }
                     }
                     .buttonStyle(.plain)
                 }
             }
         }
+    }
+
+    private func monthNavigationButton(systemName: String, monthDelta: Int) -> some View {
+        Button {
+            if let moved = CalendarMonthNavigator.monthOffset(
+                from: selectedDate,
+                by: monthDelta,
+                calendar: calendar
+            ) {
+                selectedDate = moved
+            }
+        } label: {
+            Image(systemName: systemName)
+                .font(.system(size: Metrics.navChevronFontSize, weight: Metrics.navChevronWeight))
+                .frame(width: Metrics.navButtonFrame, height: Metrics.navButtonFrame)
+        }
+        .buttonStyle(.plain)
     }
 }

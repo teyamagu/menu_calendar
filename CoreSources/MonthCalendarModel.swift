@@ -1,6 +1,9 @@
 import Foundation
 
 public enum MonthCalendarModel {
+    /// Six calendar weeks × 7 columns.
+    public static let daysGridCellCount = 42
+
     public static func monthStart(for date: Date, calendar: Calendar) -> Date? {
         let comps = calendar.dateComponents([.year, .month], from: date)
         return calendar.date(from: comps)
@@ -18,7 +21,7 @@ public enum MonthCalendarModel {
             start = prev
         }
 
-        return (0 ..< 42).compactMap { offset in
+        return (0 ..< daysGridCellCount).compactMap { offset in
             calendar.date(byAdding: .day, value: offset, to: start)
         }
     }

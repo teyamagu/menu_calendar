@@ -21,15 +21,7 @@ public final class MenuCalendarState: ObservableObject {
 
         initialClock.$now
             .sink { [weak self] newNow in
-                guard let self else { return }
-
-                let calendar = self.calendarForDisplay
-                if !calendar.isDate(newNow, inSameDayAs: self.lastNow) {
-                    if calendar.isDate(self.selectedDate, inSameDayAs: self.lastNow) {
-                        self.selectedDate = newNow
-                    }
-                }
-                self.lastNow = newNow
+                self?.applyClockTick(newNow)
             }
             .store(in: &cancellables)
     }
@@ -40,5 +32,15 @@ public final class MenuCalendarState: ObservableObject {
 
     public var menuBarTitle: String {
         MenuBarDateFormatter.makeTitle(from: clock.now, timeZone: displayTimeZone)
+    }
+
+    private func applyClockTick(_ newNow: Date) {
+        let calendar = calendarForDisplay
+        if !calendar.isDate(newNow, inSameDayAs: lastNow) {
+            if calendar.isDate(selectedDate, inSameDayAs: lastNow) {
+                selectedDate = newNow
+            }
+        }
+        lastNow = newNow
     }
 }

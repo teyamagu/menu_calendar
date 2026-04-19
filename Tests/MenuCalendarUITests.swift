@@ -37,7 +37,7 @@ final class MonthCalendarDisplayTests: XCTestCase {
         let ref = DateFormatter()
         ref.locale = ja
         ref.calendar = cal
-        ref.setLocalizedDateFormatFromTemplate("yMMM")
+        ref.setLocalizedDateFormatFromTemplate(MonthCalendarDisplay.monthHeaderDateTemplate)
         XCTAssertEqual(MonthCalendarDisplay.monthTitle(for: d, calendar: cal, locale: ja), ref.string(from: start))
     }
 
