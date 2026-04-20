@@ -27,6 +27,12 @@ public final class MenuCalendarState: ObservableObject {
         self.launchAtLoginEnabled = launchAtLoginController.isEnabled
         self.lastNow = initialClock.now
 
+        initialClock.objectWillChange
+            .sink { [weak self] in
+                self?.objectWillChange.send()
+            }
+            .store(in: &cancellables)
+
         initialClock.$now
             .sink { [weak self] newNow in
                 self?.applyClockTick(newNow)

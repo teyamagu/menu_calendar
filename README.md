@@ -141,10 +141,10 @@ The app **does not collect or send data over the network**; it only does on-devi
 To build the ZIP attached to a GitHub release (`MenuCalendar.app` + root `LICENSE`):
 
 ```bash
-./scripts/package_github_release.sh 1.0.1
+./scripts/package_github_release.sh 1.0.2
 ```
 
-Output: `dist/MenuCalendar-1.0.1.zip`. The script prints **SHA256** for release notes if you need it.
+Output: `dist/MenuCalendar-1.0.2.zip`. The script prints **SHA256** for release notes if you need it.
 
 ## Contributing
 
