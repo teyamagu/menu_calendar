@@ -5,15 +5,21 @@ import SwiftUI
 public struct CalendarMenuContent: View {
     @Binding private var selectedDate: Date
     private let calendar: Calendar
+    private let launchAtLoginEnabled: Bool
+    private let onLaunchAtLoginChanged: (Bool) -> Void
     private let onQuit: () -> Void
 
     public init(
         selectedDate: Binding<Date>,
         calendar: Calendar,
+        launchAtLoginEnabled: Bool = false,
+        onLaunchAtLoginChanged: @escaping (Bool) -> Void = { _ in },
         onQuit: @escaping () -> Void = { NSApplication.shared.terminate(nil) }
     ) {
         self._selectedDate = selectedDate
         self.calendar = calendar
+        self.launchAtLoginEnabled = launchAtLoginEnabled
+        self.onLaunchAtLoginChanged = onLaunchAtLoginChanged
         self.onQuit = onQuit
     }
 
@@ -27,6 +33,14 @@ public struct CalendarMenuContent: View {
                 selectedDate = Date()
             }
             .keyboardShortcut("t", modifiers: [.command])
+
+            Toggle(
+                MenuCalendarControlRules.launchAtLoginToggleTitle,
+                isOn: Binding(
+                    get: { launchAtLoginEnabled },
+                    set: { onLaunchAtLoginChanged($0) }
+                )
+            )
 
             Divider()
 

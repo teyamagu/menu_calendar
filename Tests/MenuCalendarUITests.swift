@@ -62,6 +62,27 @@ final class MonthCalendarDisplayTests: XCTestCase {
 
 // MARK: - MenuCalendarState + ClockModel
 
+private enum LaunchAtLoginTestError: Error {
+    case failedToUpdate
+}
+
+private final class MockLaunchAtLoginController: LaunchAtLoginControlling {
+    var isEnabled: Bool
+    var setEnabledError: Error?
+
+    init(isEnabled: Bool, setEnabledError: Error? = nil) {
+        self.isEnabled = isEnabled
+        self.setEnabledError = setEnabledError
+    }
+
+    func setEnabled(_ enabled: Bool) throws {
+        if let setEnabledError {
+            throw setEnabledError
+        }
+        isEnabled = enabled
+    }
+}
+
 @MainActor
 final class MenuCalendarStateBehaviorTests: XCTestCase {
     func testDayAdvance_syncsSelectedDateWhenUserHadBeenOnClockDay() {
@@ -101,6 +122,43 @@ final class MenuCalendarStateBehaviorTests: XCTestCase {
     func testDisplayTimeZone_isAutoupdatingCurrent() {
         let state = MenuCalendarState(clock: ClockModel(runsTimer: false))
         XCTAssertEqual(state.displayTimeZone.identifier, TimeZone.autoupdatingCurrent.identifier)
+    }
+
+    func testLaunchAtLogin_initialValue_readsControllerState() {
+        let controller = MockLaunchAtLoginController(isEnabled: true)
+        let state = MenuCalendarState(
+            clock: ClockModel(runsTimer: false),
+            launchAtLoginController: controller
+        )
+        XCTAssertTrue(state.launchAtLoginEnabled)
+    }
+
+    func testLaunchAtLogin_toggle_updatesControllerState() {
+        let controller = MockLaunchAtLoginController(isEnabled: false)
+        let state = MenuCalendarState(
+            clock: ClockModel(runsTimer: false),
+            launchAtLoginController: controller
+        )
+        state.setLaunchAtLoginEnabled(true)
+        XCTAssertTrue(controller.isEnabled)
+        XCTAssertTrue(state.launchAtLoginEnabled)
+        XCTAssertNil(state.launchAtLoginErrorMessage)
+    }
+
+    func testLaunchAtLogin_toggleFailure_restoresPreviousValue() {
+        let controller = MockLaunchAtLoginController(
+            isEnabled: false,
+            setEnabledError: LaunchAtLoginTestError.failedToUpdate
+        )
+        let state = MenuCalendarState(
+            clock: ClockModel(runsTimer: false),
+            launchAtLoginController: controller
+        )
+
+        state.setLaunchAtLoginEnabled(true)
+
+        XCTAssertFalse(state.launchAtLoginEnabled)
+        XCTAssertNotNil(state.launchAtLoginErrorMessage)
     }
 }
 
@@ -196,5 +254,17 @@ final class CalendarMenuContentInspectorTests: XCTestCase {
         )
         try view.inspect().find(button: MenuCalendarControlRules.todayButtonTitle).tap()
         XCTAssertTrue(Calendar.current.isDateInToday(selected))
+    }
+
+    func testLaunchAtLoginToggle_isVisible() throws {
+        let date = TestCalendars.date(year: 2026, month: 3, day: 26)
+        let view = CalendarMenuContent(
+            selectedDate: .constant(date),
+            calendar: testCalendar,
+            launchAtLoginEnabled: false,
+            onLaunchAtLoginChanged: { _ in },
+            onQuit: {}
+        )
+        _ = try view.inspect().find(text: MenuCalendarControlRules.launchAtLoginToggleTitle).string()
     }
 }

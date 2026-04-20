@@ -10,7 +10,9 @@ struct MenuCalendarApp: App {
         MenuBarExtra {
             CalendarMenuContent(
                 selectedDate: $state.selectedDate,
-                calendar: state.calendarForDisplay
+                calendar: state.calendarForDisplay,
+                launchAtLoginEnabled: state.launchAtLoginEnabled,
+                onLaunchAtLoginChanged: state.setLaunchAtLoginEnabled
             )
         } label: {
             Text(state.menuBarTitle)

@@ -9,6 +9,7 @@ It is **open source** and accepts improvements via Issues and pull requests.
 - Click to open the current month’s calendar
 - Previous / next month navigation
 - **Today** jumps back to the current date
+- Optional **Launch at Login** toggle in the menu
 - Quit from the menu (`⌘Q`)
 
 ## Tech stack
@@ -140,10 +141,10 @@ The app **does not collect or send data over the network**; it only does on-devi
 To build the ZIP attached to a GitHub release (`MenuCalendar.app` + root `LICENSE`):
 
 ```bash
-./scripts/package_github_release.sh 1.0.0
+./scripts/package_github_release.sh 1.0.1
 ```
 
-Output: `dist/MenuCalendar-1.0.0.zip`. The script prints **SHA256** for release notes if you need it.
+Output: `dist/MenuCalendar-1.0.1.zip`. The script prints **SHA256** for release notes if you need it.
 
 ## Contributing
 

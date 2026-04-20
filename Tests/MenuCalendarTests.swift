@@ -217,6 +217,7 @@ final class CalendarMenuLayoutRulesTests: XCTestCase {
 final class MenuCalendarControlRulesTests: XCTestCase {
     func testQuitMenuStrings() {
         XCTAssertEqual(MenuCalendarControlRules.todayButtonTitle, "Today")
+        XCTAssertEqual(MenuCalendarControlRules.launchAtLoginToggleTitle, "Launch at Login")
         XCTAssertEqual(MenuCalendarControlRules.quitMenuTitle, "Quit")
         XCTAssertEqual(MenuCalendarControlRules.quitShortcutKey, "q" as Character)
     }
